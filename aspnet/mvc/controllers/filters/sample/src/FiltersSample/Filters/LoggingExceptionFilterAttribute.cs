@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Mvc.Filters;
+﻿using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 
 namespace FiltersSample.Filters
@@ -14,7 +15,7 @@ namespace FiltersSample.Filters
         public override void OnException(ExceptionContext context)
         {
             _logger.LogError(eventId:0,state:null,error:context.Exception);
-            base.OnException(context);
+            context.Exception = null; // mark exception as handled
         }
     }
 }
