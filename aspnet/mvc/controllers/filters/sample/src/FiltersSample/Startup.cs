@@ -14,8 +14,8 @@ namespace FiltersSample
         {
             services.AddMvc(options =>
             {
-                options.Filters.Add(new SampleGlobalActionFilter());
-                options.Filters.Add(typeof(DurationActionFilter));
+                options.Filters.Add(typeof(DurationActionFilter)); // by type
+                options.Filters.Add(new SampleGlobalActionFilter()); // an instance
                 options.Filters.Add(new OrderLoggingActionFilterAttribute() {Name = "Global"});
             });
             services.AddScoped<LoggingAddHeaderFilter>();
