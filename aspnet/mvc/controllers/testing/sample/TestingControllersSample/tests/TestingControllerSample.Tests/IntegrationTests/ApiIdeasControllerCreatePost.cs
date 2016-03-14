@@ -31,7 +31,7 @@ namespace TestingControllerSample.Tests.IntegrationTests
 
         internal class NewIdeaDto
         {
-            public NewIdeaDto(string name, string description, int? sessionId)
+            public NewIdeaDto(string name, string description, int sessionId)
             {
                 Name = name;
                 Description = description;
@@ -40,7 +40,7 @@ namespace TestingControllerSample.Tests.IntegrationTests
 
             public string Name { get; set; }
             public string Description { get; set; }
-            public int? SessionId { get; set; }
+            public int SessionId { get; set; }
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace TestingControllerSample.Tests.IntegrationTests
         [Fact]
         public async Task ReturnsBadRequestForMissingSessionIdValue()
         {
-            var newIdea = new NewIdeaDto("Name", "Description", null);
+            var newIdea = new NewIdeaDto("Name", "Description", 0);
             var response = await _client.PostAsJsonAsync("/api/ideas/create", newIdea);
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
