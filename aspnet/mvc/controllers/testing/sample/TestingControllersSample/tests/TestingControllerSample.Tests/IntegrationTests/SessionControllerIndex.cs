@@ -10,12 +10,12 @@ using Xunit;
 
 namespace TestingControllerSample.Tests.IntegrationTests
 {
-    public class HomeControllerIndex
+    public class SessionControllerIndex
     {
         private readonly TestServer _server;
         private readonly HttpClient _client;
 
-        public HomeControllerIndex()
+        public SessionControllerIndex()
         {
             _server = new TestServer(TestServer.CreateBuilder()
                 .UseEnvironment("Development")
@@ -34,16 +34,17 @@ namespace TestingControllerSample.Tests.IntegrationTests
         }
 
         [Fact]
-        public async Task ReturnsInitialListOfBrainstormSessions()
+        public async Task ReturnsCorrectSessionPage()
         {
-            var response = await _client.GetAsync("/");
+            var response = await _client.GetAsync("/Session/Index/1");
             response.EnsureSuccessStatusCode();
 
             var responseString = await response.Content.ReadAsStringAsync();
 
             var testSession = Startup.GetTestSession();
             Assert.True(responseString.Contains(testSession.Name));
-        }
 
+            // ideas are loaded client-side
+        }
     }
 }

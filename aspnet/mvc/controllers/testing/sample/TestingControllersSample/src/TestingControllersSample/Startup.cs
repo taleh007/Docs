@@ -35,7 +35,7 @@ namespace TestingControllersSample
 
                 app.UseRuntimeInfoPage(); // default path is /runtimeinfo
                 
-                InitializeDatabase(app.ApplicationServices.GetService<AppDbContext>());
+                InitializeDatabase(app.ApplicationServices.GetService<IBrainStormSessionRepository>());
 
             }
             app.UseIISPlatformHandler();
@@ -43,25 +43,29 @@ namespace TestingControllersSample
             app.UseStaticFiles();
         }
 
-        public void InitializeDatabase(AppDbContext dbContext)
+        public void InitializeDatabase(IBrainStormSessionRepository repo)
         {
-            if (!dbContext.BrainStormSessions.Any())
+            if (!repo.List().Any())
             {
-                var session = new BrainStormSession()
-                {
-                    Name = "Test Session 1",
-                    DateCreated = new DateTime(2016, 8, 1)
-                };
-                var idea = new Idea()
-                {
-                    DateCreated = new DateTime(2016, 8, 1),
-                    Description = "Totally awesome idea",
-                    Name = "Awesome idea"
-                };
-                session.AddIdea(idea);
-                dbContext.BrainStormSessions.Add(session);
-                dbContext.SaveChanges();
+                repo.Add(GetTestSession());
             }
+        }
+
+        public static BrainStormSession GetTestSession()
+        {
+            var session = new BrainStormSession()
+            {
+                Name = "Test Session 1",
+                DateCreated = new DateTime(2016, 8, 1)
+            };
+            var idea = new Idea()
+            {
+                DateCreated = new DateTime(2016, 8, 1),
+                Description = "Totally awesome idea",
+                Name = "Awesome idea"
+            };
+            session.AddIdea(idea);
+            return session;
         }
 
         // Entry point for the application.
