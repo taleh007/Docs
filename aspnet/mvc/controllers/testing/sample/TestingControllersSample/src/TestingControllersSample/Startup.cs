@@ -17,10 +17,12 @@ namespace TestingControllersSample
         {
             services.AddEntityFramework()
                 .AddInMemoryDatabase()
-                .AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase());
+                .AddDbContext<AppDbContext>(options => 
+                options.UseInMemoryDatabase());
 
             services.AddMvc();
-            services.AddScoped<IBrainStormSessionRepository, EfStormSessionRepository>();
+            services.AddScoped<IBrainStormSessionRepository, 
+                EfStormSessionRepository>();
         }
 
         public void Configure(IApplicationBuilder app, 
@@ -35,7 +37,8 @@ namespace TestingControllersSample
 
                 app.UseRuntimeInfoPage(); // default path is /runtimeinfo
                 
-                InitializeDatabase(app.ApplicationServices.GetService<IBrainStormSessionRepository>());
+                InitializeDatabase(app.ApplicationServices
+                    .GetService<IBrainStormSessionRepository>());
 
             }
             app.UseIISPlatformHandler();

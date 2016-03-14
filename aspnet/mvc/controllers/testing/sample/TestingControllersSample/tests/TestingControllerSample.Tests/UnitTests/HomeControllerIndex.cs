@@ -9,7 +9,7 @@ using TestingControllersSample.Core.Model;
 using TestingControllersSample.ViewModels;
 using Xunit;
 
-namespace TestingControllerSample.Tests.Tests
+namespace TestingControllerSample.Tests.UnitTests
 {
     public class HomeControllerIndex
     {

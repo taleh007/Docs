@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
 using Moq;
@@ -53,7 +52,7 @@ namespace TestingControllerSample.Tests.UnitTests
             mockRepo.Setup(r => r.Update(testSession)).Verifiable();
 
             var result = Assert.IsType<ObjectResult>(controller.Create(newIdea));
-            var returnSession = result.Value as BrainStormSession;
+            var returnSession = Assert.IsType<BrainStormSession>(result.Value);
 
             mockRepo.Verify();
             Assert.Equal(2, returnSession.Ideas.Count());

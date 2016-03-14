@@ -24,8 +24,9 @@ namespace TestingControllerSample.Tests.IntegrationTests
                 {
                     var env = new TestApplicationEnvironment();
                     env.ApplicationBasePath =
-                        Path.GetFullPath(Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "..",
-                            "..", "src", "TestingControllersSample"));
+                        Path.GetFullPath(Path.Combine(
+                            PlatformServices.Default.Application.ApplicationBasePath, 
+                            "..", "..", "src", "TestingControllersSample"));
                     env.ApplicationName = "TestingControllersSample";
                     services.AddInstance<IApplicationEnvironment>(env);
                 })

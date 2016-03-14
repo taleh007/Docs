@@ -29,7 +29,7 @@ namespace TestingControllersSample.Api
             return new ObjectResult(session.Ideas.Select(i => new
             {
                 id = i.Id,
-                name =i.Name,
+                name = i.Name,
                 description = i.Description,
                 dateCreated = i.DateCreated
             }));

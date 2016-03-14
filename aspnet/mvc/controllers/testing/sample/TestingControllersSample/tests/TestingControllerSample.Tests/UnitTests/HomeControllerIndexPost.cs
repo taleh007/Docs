@@ -25,16 +25,17 @@ namespace TestingControllerSample.Tests.UnitTests
         }
 
         [Fact]
-        public void ReturnsARedirectToActionResultWhenModelStateIsValid()
+        public void ReturnsARedirectToActionResultAndAddsSessionWhenModelStateIsValid()
         {
             var mockRepo = new Mock<IBrainStormSessionRepository>();
-            mockRepo.Setup(r => r.List()).Returns(GetTestSessions());
+            mockRepo.Setup(r => r.Add(It.IsAny<BrainStormSession>())).Verifiable();
             var controller = new HomeController(mockRepo.Object);
             var newSession = new HomeController.NewSessionModel() {SessionName = "Test Name"};
 
             var result = Assert.IsType<RedirectToActionResult>(controller.Index(newSession));
             Assert.Equal("Home", result.ControllerName);
             Assert.Equal("Index", result.ActionName);
+            mockRepo.Verify();
         }
 
         private List<BrainStormSession> GetTestSessions()

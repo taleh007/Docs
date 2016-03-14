@@ -51,6 +51,5 @@ namespace TestingControllersSample.Controllers
             });
             return new RedirectToActionResult("Index", "Home", null);
         }
-
     }
 }

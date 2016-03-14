@@ -6,7 +6,6 @@ using Microsoft.AspNet.TestHost;
 using TestingControllersSample;
 using Xunit;
 using System.Linq;
-using System.Net.Http.Headers;
 using TestingControllersSample.Core.Model;
 
 namespace TestingControllerSample.Tests.IntegrationTests
@@ -22,11 +21,6 @@ namespace TestingControllerSample.Tests.IntegrationTests
                 .UseEnvironment("Development")
                 .UseStartup<Startup>());
             _client = _server.CreateClient();
-
-            // client always expects json results
-            _client.DefaultRequestHeaders.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         internal class NewIdeaDto
@@ -60,9 +54,17 @@ namespace TestingControllerSample.Tests.IntegrationTests
         }
 
         [Fact]
-        public async Task ReturnsBadRequestForMissingSessionIdValue()
+        public async Task ReturnsBadRequestForSessionIdValueTooSmall()
         {
             var newIdea = new NewIdeaDto("Name", "Description", 0);
+            var response = await _client.PostAsJsonAsync("/api/ideas/create", newIdea);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task ReturnsBadRequestForSessionIdValueTooLarge()
+        {
+            var newIdea = new NewIdeaDto("Name", "Description", 1000001);
             var response = await _client.PostAsJsonAsync("/api/ideas/create", newIdea);
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
