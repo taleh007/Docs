@@ -2,21 +2,21 @@ Testing Controller Logic
 ========================
 By `Steve Smith`_
 
-Controllers in ASP.NET MVC apps should be small and focused on user-interface concerns. Provided this recommendation is followed, testing your app's controller logic should be fairly straightforward.
+Controllers in ASP.NET MVC apps should be small and focused on user-interface concerns. Large controllers that deal with non-UI concerns are more difficult to test and maintain.
 
 .. contents:: Sections
 	:local:
 	:depth: 1
 	
-`View sample files <https://github.com/aspnet/Docs/tree/1.0.0-rc1/aspnet/mvc/controllers/testing/sample>`_
+`View sample files <https://github.com/aspnet/Docs/tree/master/aspnet/mvc/controllers/testing/sample>`_
 
 What is Controller Logic
 ------------------------
-*Controllers* define groups of *actions*. The framework could have been designed around isolated actions, but grouping them using controllers often useful for :doc:`routing </fundamentals/routing>`, applying :doc:`filters <filters>`, and :doc:`injecting common dependencies <dependency-injection>`. 
+*Controllers* define groups of related *actions*. The grouping of related actions into controllers is useful for :doc:`routing </fundamentals/routing>`, applying :doc:`filters <filters>`, and :doc:`injecting common dependencies <dependency-injection>`. 
 
 :doc:`Learn more about controllers and actions <actions>`.
 
-Controller logic should be minimal and should not be focused on business logic or infrastructure concerns like data access. When testing controller logic, avoid testing the framework as much as possible. You should test how the controller *behaves* based on valid or invalid inputs, and what kind of response it provides based on the result of some business operation it performs.
+Controller logic should be minimal and not be focused on business logic or infrastructure concerns (for example, data access). Test controller logic, not the framework. Test how the controller *behaves* based on valid or invalid inputs. Test controller responses based on the result of the business operation it performs.
 
 Typical controller responsibilities:
 	- Verify ``ModelState.IsValid``
