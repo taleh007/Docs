@@ -1,17 +1,10 @@
-﻿using System.Threading.Tasks;
-using FiltersSample.Helper;
+﻿using FiltersSample.Helper;
 using Microsoft.AspNet.Mvc.Filters;
 
 namespace FiltersSample.Filters
 {
-    public class SampleGlobalActionFilter : IActionFilter, IAsyncActionFilter
+    public class SampleGlobalActionFilter : IActionFilter
     {
-        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
-        {
-            OnActionExecuting(context);
-            OnActionExecuted(await next());
-        }
-
         public void OnActionExecuting(ActionExecutingContext context)
         {
             if (context.ActionDescriptor.DisplayName == "FiltersSample.Controllers.HomeController.Hello")

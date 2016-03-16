@@ -52,11 +52,7 @@ Asynchronous filters define a single On\ *Stage*\ ExecutionAsync method that wil
   :language: c#
   :emphasize-lines: 6,8-9
 
-If your application includes both synchronous and async methods, you should consider implementing both the async and synchronous filter interfaces, as shown below:
-
-.. literalinclude:: filters/sample/src/FiltersSample/Filters/SampleCombinedActionFilter.cs
-  :language: c#
-  :emphasize-lines: 11-12
+.. note:: You should only implement *either* the synchronous or the async version of a filter interface, not both. If you need to perform async work in the filter, implement the async interface. Otherwise, implement the synchronous interface. The framework will check to see if the filter implements the async interface first, and if so, it will call it. If not, it will call the synchronous interface's method(s). If you were to implement both interfaces on one class, only the async method would be called by the framework. Also, it doesn't matter whether your action is async or not, your filters can be synchronous or async independent of the action.
 
 Filters and Attributes
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -97,17 +93,8 @@ However, if your filters have dependencies you need to access from DI, there are
 	- The `ServiceFilterAttribute <https://docs.asp.net/projects/api/en/latest/autoapi/Microsoft/AspNet/Mvc/ServiceFilterAttribute/index.html>`_ 
 	- The `TypeFilterAttribute <https://docs.asp.net/projects/api/en/latest/autoapi/Microsoft/AspNet/Mvc/TypeFilterAttribute/index.html>`_ attribute
 	- `IFilterFactory <https://docs.asp.net/projects/api/en/latest/autoapi/Microsoft/AspNet/Mvc/Filters/IFilterFactory/index.html>`__ implemented on your attribute
-	- Access to the services you require from the context parameter provided to your filter's On\ *Stage* methods.
 
-For an example of this last technique, consider the following method, which needs to access a service that has been registered with DI. The service is accessible from the context parameter:
-
-.. literalinclude:: filters/sample/src/FiltersSample/Filters/OrderLoggingActionFilterAttribute.cs
-  :language: c#
-  :emphasize-lines: 3-4
-  :lines: 10-20
-  :dedent: 8
-
-.. note:: Some of the filters shown in these examples implement logging in order to demonstrate when, where, or how they are executing. You should avoid creating and using filters purely for logging purposes, since the :doc:`built-in framework logging features </fundamentals/logging>` should already provide what you need for logging. If you're going to add logging to your filters, it should focus on business domain concerns or behavior specific to your filter, rather than MVC actions or other framework events.  
+.. note:: Some of the filters shown in these examples implement logging in order to demonstrate when, where, or how they are executing. Avoid creating and using filters purely for logging purposes, since the :doc:`built-in framework logging features </fundamentals/logging>` should already provide what you need for logging. If you're going to add logging to your filters, it should focus on business domain concerns or behavior specific to your filter, rather than MVC actions or other framework events.  
   
 Cancellation and Short Circuiting
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -192,9 +179,6 @@ You can implement ``IFilterFactory`` on your own attribute implementations as an
   :emphasize-lines: 1,4-7
   :lines: 6-26
   :dedent: 4
-
-@rynowak - can you clarify this next bit?
-If you're using ``IFilterFactory``, you can specify lifetime of the filter (how?). When your filter is the instance, your filter instance is cached, so avoid do anything stateful in the filter returned by ``CreateInstance``.
 
 .. _ordering:
 
