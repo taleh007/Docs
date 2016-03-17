@@ -17,7 +17,7 @@ namespace TestingControllersSample.Controllers
         {
             if (!id.HasValue)
             {
-                return RedirectToAction("Index","Home",null);
+                return RedirectToAction("Index","Home");
             }
             var session = _sessionRepository.GetById(id.Value);
             if (session == null)
