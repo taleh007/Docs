@@ -14,40 +14,43 @@ namespace TestingControllerSample.Tests.UnitTests
         [Fact]
         public void ReturnsAViewResultWhenModelStateIsInvalid()
         {
-            var mockRepo = new Mock<IBrainStormSessionRepository>();
+            var mockRepo = new Mock<IBrainstormSessionRepository>();
             mockRepo.Setup(r => r.List()).Returns(GetTestSessions());
             var controller = new HomeController(mockRepo.Object);
             controller.ModelState.AddModelError("SessionName", "Required");
             var newSession = new HomeController.NewSessionModel();
 
             var result = Assert.IsType<ViewResult>(controller.Index(newSession));
-            var model = Assert.IsAssignableFrom<IEnumerable<StormSessionViewModel>>(result.ViewData.Model);
+            Assert.IsAssignableFrom<IEnumerable<StormSessionViewModel>>
+                (result.ViewData.Model);
         }
 
         [Fact]
-        public void ReturnsARedirectToActionResultAndAddsSessionWhenModelStateIsValid()
+        public void ReturnsARedirectAndAddsSessionWhenModelStateIsValid()
         {
-            var mockRepo = new Mock<IBrainStormSessionRepository>();
-            mockRepo.Setup(r => r.Add(It.IsAny<BrainStormSession>())).Verifiable();
+            var mockRepo = new Mock<IBrainstormSessionRepository>();
+            mockRepo.Setup(r => r.Add(It.IsAny<BrainstormSession>())).Verifiable();
             var controller = new HomeController(mockRepo.Object);
-            var newSession = new HomeController.NewSessionModel() {SessionName = "Test Name"};
+            var newSession = new HomeController.NewSessionModel()
+                { SessionName = "Test Name"};
 
-            var result = Assert.IsType<RedirectToActionResult>(controller.Index(newSession));
+            var result = Assert.IsType<RedirectToActionResult>
+                (controller.Index(newSession));
             Assert.Equal("Home", result.ControllerName);
             Assert.Equal("Index", result.ActionName);
             mockRepo.Verify();
         }
 
-        private List<BrainStormSession> GetTestSessions()
+        private List<BrainstormSession> GetTestSessions()
         {
-            var sessions = new List<BrainStormSession>();
-            sessions.Add(new BrainStormSession()
+            var sessions = new List<BrainstormSession>();
+            sessions.Add(new BrainstormSession()
             {
                 DateCreated = new DateTime(2016, 7, 2),
                 Id = 1,
                 Name = "Test One"
             });
-            sessions.Add(new BrainStormSession()
+            sessions.Add(new BrainstormSession()
             {
                 DateCreated = new DateTime(2016, 7, 1),
                 Id = 2,

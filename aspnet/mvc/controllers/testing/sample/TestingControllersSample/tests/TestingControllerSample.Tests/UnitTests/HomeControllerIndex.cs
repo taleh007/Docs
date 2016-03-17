@@ -16,25 +16,26 @@ namespace TestingControllerSample.Tests.UnitTests
         [Fact]
         public void ReturnsAViewResultWithAListOfBrainstormSessions()
         {
-            var mockRepo = new Mock<IBrainStormSessionRepository>();
+            var mockRepo = new Mock<IBrainstormSessionRepository>();
             mockRepo.Setup(r => r.List()).Returns(GetTestSessions());
             var controller = new HomeController(mockRepo.Object);
 
             var result = Assert.IsType<ViewResult>(controller.Index());
-            var model = Assert.IsAssignableFrom<IEnumerable<StormSessionViewModel>>(result.ViewData.Model);
+            var model = Assert.IsAssignableFrom<IEnumerable<StormSessionViewModel>>
+                (result.ViewData.Model);
             Assert.Equal(2, model.Count());
         }
 
-        private List<BrainStormSession> GetTestSessions()
+        private List<BrainstormSession> GetTestSessions()
         {
-            var sessions = new List<BrainStormSession>();
-            sessions.Add(new BrainStormSession()
+            var sessions = new List<BrainstormSession>();
+            sessions.Add(new BrainstormSession()
             {
                 DateCreated = new DateTime(2016, 7, 2),
                 Id = 1,
                 Name = "Test One"
             });
-            sessions.Add(new BrainStormSession()
+            sessions.Add(new BrainstormSession()
             {
                 DateCreated = new DateTime(2016, 7, 1),
                 Id = 2,

@@ -14,9 +14,9 @@ namespace TestingControllerSample.Tests.UnitTests
         [Fact]
         public void ReturnsHttpNotFoundForInvalidSession()
         {
-            var mockRepo = new Mock<IBrainStormSessionRepository>();
+            var mockRepo = new Mock<IBrainstormSessionRepository>();
             int testSessionId = 123;
-            mockRepo.Setup(r => r.GetById(testSessionId)).Returns((BrainStormSession)null);
+            mockRepo.Setup(r => r.GetById(testSessionId)).Returns((BrainstormSession)null);
             var controller = new IdeasController(mockRepo.Object);
 
             var result = Assert.IsType<HttpNotFoundObjectResult>(controller.ForSession(testSessionId));
@@ -25,7 +25,7 @@ namespace TestingControllerSample.Tests.UnitTests
         [Fact]
         public void ReturnsIdeasForSession()
         {
-            var mockRepo = new Mock<IBrainStormSessionRepository>();
+            var mockRepo = new Mock<IBrainstormSessionRepository>();
             int testSessionId = 123;
             mockRepo.Setup(r => r.GetById(testSessionId)).Returns(GetTestSession());
             var controller = new IdeasController(mockRepo.Object);
@@ -37,9 +37,9 @@ namespace TestingControllerSample.Tests.UnitTests
             Assert.Equal("One", idea.name);
         }
 
-        private BrainStormSession GetTestSession()
+        private BrainstormSession GetTestSession()
         {
-            var session = new BrainStormSession()
+            var session = new BrainstormSession()
             {
                 DateCreated = new DateTime(2016, 7, 2),
                 Id = 1,

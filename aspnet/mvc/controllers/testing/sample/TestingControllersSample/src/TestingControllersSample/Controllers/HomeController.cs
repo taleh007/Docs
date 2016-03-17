@@ -10,9 +10,9 @@ namespace TestingControllersSample.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IBrainStormSessionRepository _sessionRepository;
+        private readonly IBrainstormSessionRepository _sessionRepository;
 
-        public HomeController(IBrainStormSessionRepository sessionRepository)
+        public HomeController(IBrainstormSessionRepository sessionRepository)
         {
             _sessionRepository = sessionRepository;
         }
@@ -44,7 +44,7 @@ namespace TestingControllersSample.Controllers
             {
                 return Index();
             }
-            _sessionRepository.Add(new BrainStormSession()
+            _sessionRepository.Add(new BrainstormSession()
             {
                 DateCreated = DateTime.Now,
                 Name = model.SessionName

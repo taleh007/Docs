@@ -10,9 +10,9 @@ namespace TestingControllersSample.Api
     [Route("api/ideas")]
     public class IdeasController : Controller
     {
-        private readonly IBrainStormSessionRepository _sessionRepository;
+        private readonly IBrainstormSessionRepository _sessionRepository;
 
-        public IdeasController(IBrainStormSessionRepository sessionRepository)
+        public IdeasController(IBrainstormSessionRepository sessionRepository)
         {
             _sessionRepository = sessionRepository;
         }

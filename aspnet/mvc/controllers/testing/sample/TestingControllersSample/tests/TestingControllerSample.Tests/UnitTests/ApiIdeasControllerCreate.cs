@@ -13,7 +13,7 @@ namespace TestingControllerSample.Tests.UnitTests
         [Fact]
         public void ReturnsBadRequestGivenInvalidModel()
         {
-            var mockRepo = new Mock<IBrainStormSessionRepository>();
+            var mockRepo = new Mock<IBrainstormSessionRepository>();
             var controller = new IdeasController(mockRepo.Object);
             controller.ModelState.AddModelError("error","some error");
 
@@ -23,9 +23,9 @@ namespace TestingControllerSample.Tests.UnitTests
         [Fact]
         public void ReturnsHttpNotFoundForInvalidSession()
         {
-            var mockRepo = new Mock<IBrainStormSessionRepository>();
+            var mockRepo = new Mock<IBrainstormSessionRepository>();
             int testSessionId = 123;
-            mockRepo.Setup(r => r.GetById(testSessionId)).Returns((BrainStormSession)null);
+            mockRepo.Setup(r => r.GetById(testSessionId)).Returns((BrainstormSession)null);
             var controller = new IdeasController(mockRepo.Object);
 
             var result = Assert.IsType<HttpNotFoundObjectResult>(controller.Create(new IdeasController.NewIdeaModel()));
@@ -35,7 +35,7 @@ namespace TestingControllerSample.Tests.UnitTests
         [Fact]
         public void ReturnsNewlyCreatedIdeaForSession()
         {
-            var mockRepo = new Mock<IBrainStormSessionRepository>();
+            var mockRepo = new Mock<IBrainstormSessionRepository>();
             int testSessionId = 123;
             string testName = "test name";
             string testDescription = "test description";
@@ -52,7 +52,7 @@ namespace TestingControllerSample.Tests.UnitTests
             mockRepo.Setup(r => r.Update(testSession)).Verifiable();
 
             var result = Assert.IsType<ObjectResult>(controller.Create(newIdea));
-            var returnSession = Assert.IsType<BrainStormSession>(result.Value);
+            var returnSession = Assert.IsType<BrainstormSession>(result.Value);
 
             mockRepo.Verify();
             Assert.Equal(2, returnSession.Ideas.Count());
@@ -60,9 +60,9 @@ namespace TestingControllerSample.Tests.UnitTests
             Assert.Equal(testDescription, returnSession.Ideas.LastOrDefault().Description);
         }
 
-        private BrainStormSession GetTestSession()
+        private BrainstormSession GetTestSession()
         {
-            var session = new BrainStormSession()
+            var session = new BrainstormSession()
             {
                 DateCreated = new DateTime(2016, 7, 2),
                 Id = 1,

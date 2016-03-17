@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNet.TestHost;
 using TestingControllersSample;
-using Xunit;
-using System.Linq;
 using TestingControllersSample.Core.Model;
+using Xunit;
 
 namespace TestingControllerSample.Tests.IntegrationTests
 {
@@ -87,7 +87,7 @@ namespace TestingControllerSample.Tests.IntegrationTests
             var response = await _client.PostAsJsonAsync("/api/ideas/create", newIdea);
             response.EnsureSuccessStatusCode();
 
-            var returnedSession = await response.Content.ReadAsJsonAsync<BrainStormSession>();
+            var returnedSession = await response.Content.ReadAsJsonAsync<BrainstormSession>();
             Assert.Equal(2, returnedSession.Ideas.Count);
             Assert.True(returnedSession.Ideas.Any(i => i.Name == testIdeaName));
         }

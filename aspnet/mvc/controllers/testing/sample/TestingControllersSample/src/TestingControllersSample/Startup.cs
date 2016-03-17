@@ -21,7 +21,7 @@ namespace TestingControllersSample
                 options.UseInMemoryDatabase());
 
             services.AddMvc();
-            services.AddScoped<IBrainStormSessionRepository, 
+            services.AddScoped<IBrainstormSessionRepository, 
                 EfStormSessionRepository>();
         }
 
@@ -38,7 +38,7 @@ namespace TestingControllersSample
                 app.UseRuntimeInfoPage(); // default path is /runtimeinfo
                 
                 InitializeDatabase(app.ApplicationServices
-                    .GetService<IBrainStormSessionRepository>());
+                    .GetService<IBrainstormSessionRepository>());
 
             }
             app.UseIISPlatformHandler();
@@ -46,7 +46,7 @@ namespace TestingControllersSample
             app.UseStaticFiles();
         }
 
-        public void InitializeDatabase(IBrainStormSessionRepository repo)
+        public void InitializeDatabase(IBrainstormSessionRepository repo)
         {
             if (!repo.List().Any())
             {
@@ -54,9 +54,9 @@ namespace TestingControllersSample
             }
         }
 
-        public static BrainStormSession GetTestSession()
+        public static BrainstormSession GetTestSession()
         {
-            var session = new BrainStormSession()
+            var session = new BrainstormSession()
             {
                 Name = "Test Session 1",
                 DateCreated = new DateTime(2016, 8, 1)

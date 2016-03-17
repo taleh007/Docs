@@ -1,11 +1,4 @@
 ﻿{
-  "version": "1.0.0-*",
-  "description": "TestingControllerSample.Tests Class Library",
-  "authors": [ "Steve Smith (@ardalis)" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-
   "frameworks": {
     "dnx451": { }
   },

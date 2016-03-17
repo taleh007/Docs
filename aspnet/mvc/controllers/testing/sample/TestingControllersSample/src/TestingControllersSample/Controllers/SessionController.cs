@@ -6,9 +6,9 @@ namespace TestingControllersSample.Controllers
 {
     public class SessionController : Controller
     {
-        private readonly IBrainStormSessionRepository _sessionRepository;
+        private readonly IBrainstormSessionRepository _sessionRepository;
 
-        public SessionController(IBrainStormSessionRepository sessionRepository)
+        public SessionController(IBrainstormSessionRepository sessionRepository)
         {
             _sessionRepository = sessionRepository;
         }

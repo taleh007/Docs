@@ -28,7 +28,11 @@ Typical controller responsibilities:
 
 Unit Testing
 ------------
-:doc:`Unit testing </testing/unit-testing>` involves testing a part of an app in isolation from its infrastructure and dependencies. When unit testing controller logic, only the contents of a single action should be tested, not the behavior of its dependencies or of the framework itself. Thus, when unit testing a controller's actions, avoid testing global or attribute-based :doc:`filters <filters>`, :doc:`routing </fundamentals/routing>`, or :doc:`model binding </mvc/models/model-binding>`, as these are all performed by the framework (testing these is an integration test responsibility).
+:doc:`Unit testing </testing/unit-testing>` involves testing a part of an app in isolation from its infrastructure and dependencies. When unit testing controller logic, only the contents of a single action should be tested, not the behavior of its dependencies or of the framework itself. As you unit test your controller actions, make sure you focus only on its behavior. Don't unit test global or attribute-based :doc:`filters <filters>`, :doc:`routing </fundamentals/routing>`, or :doc:`model binding </mvc/models/model-binding>`, as part of your action's unit tests. These are all performed by the framework, and testing how they interact with your action is an integration test responsibility. 
+
+If you've writting custom filters, routes, etc, you should unit test them, but not as part of your tests on a particular controller action. They should be tested in isolation.
+
+.. tip:: `Create and run unit tests with Visual Studio <https://www.visualstudio.com/en-us/get-started/code/create-and-run-unit-tests-vs>`__.
 
 To demonstrate unit testing, review the following controller. It displays a list of brainstorming sessions and allows new brainstorming sessions to be created with a POST:
 
@@ -36,21 +40,28 @@ To demonstrate unit testing, review the following controller. It displays a list
   :language: c#
   :emphasize-lines: 11,15,20,40-41
 
-The controller is following the `explicit dependencies principle <http://deviq.com/explicit-dependencies-principle/>`_, expecting dependency injection to provide it with an instance of ``IBrainStormSessionRepository``. This makes it fairly easy to test using a mock object framework, like `Moq <https://www.nuget.org/packages/Moq/>`_. To test the first ``Index`` method, which has no looping or branching logic and only calls one method, we need only verify that a ``ViewResult`` is returned, with a ``ViewModel`` containing whatever was returned from the repository's ``List`` method.
+The controller is following the `explicit dependencies principle <http://deviq.com/explicit-dependencies-principle/>`_, expecting dependency injection to provide it with an instance of ``IBrainstormSessionRepository``. This makes it fairly easy to test using a mock object framework, like `Moq <https://www.nuget.org/packages/Moq/>`_. The ``HTTP GET Index`` method has no looping or branching and only calls one method. To test this ``Index`` method, we need to verify that a ``ViewResult`` is returned, with a ``ViewModel`` from the repository's ``List`` method.
 
 .. literalinclude:: testing/sample/TestingControllersSample/tests/TestingControllerSample.Tests/UnitTests/HomeControllerIndex.cs
   :language: c#
-  :emphasize-lines: 16-17,23-25
+  :emphasize-lines: 16-17,23-26
 
-The second ``Index`` method (which accepts an ``HttpPost``) has slightly more logic, since it checks ``ModelState.IsValid``. We should test that, when ``ModelState.IsValid`` is ``false`` the action method returns a ``ViewResult`` with the appropriate data. Otherwise, we should confirm that the ``Add`` method is called on the repository and a ``RedirectToActionResult`` is returned with the correct arguments. Below are its unit tests:
+The ``HttpPost Index`` method (shown below) should verify:
+
+	- The action method returns a ``ViewResult`` with the appropriate data when ``ModelState.IsValid`` is ``false``
+	- The ``Add`` method on the repository is called and a ``RedirectToActionResult`` is returned with the correct arguments when ``ModelState.IsValid`` is false.
 
 .. literalinclude:: testing/sample/TestingControllersSample/tests/TestingControllerSample.Tests/UnitTests/HomeControllerIndexPost.cs
   :language: c#
-  :emphasize-lines: 14-15,20,27-28,31,38
+  :lines: 12-61
+  :dedent: 4
+  :emphasize-lines: 3-4,9,17-18,21,30
 
-The first test confirms that, when the ``ModelState`` is not valid, the method returns the same ``ViewResult`` as a GET request would. Note that the test doesn't attempt to pass in an invalid model. That wouldn't work anyway since model binding isn't running - we're just calling the method directly. However, we're not trying to test model binding - we're only testing what our code in the action method does. So the simplest thing is to just explicitly add an error to ``ModelState``.
+The first test confirms when ``ModelState`` is not valid, the same ``ViewResult`` is returned as for a ``GET`` request. Note that the test doesn't attempt to pass in an invalid model. That wouldn't work anyway since model binding isn't running - we're just calling the method directly. However, we're not trying to test model binding - we're only testing what our code in the action method does. The simplest approach is to add an error to ``ModelState``.
 
-The second test verifies that when ``ModelState`` is valid, a new ``BrainStormSession`` is added (via the repository), and the method returns a ``RedirectToActionResult`` with the expected properties. Mocked calls that aren't called are normally ignored, but calling ``Verifiable`` at the end of the setup call allows it to be verified in the test. This is done with the call to ``mockRepo.Verify``.
+The second test verifies that when ``ModelState`` is valid, a new ``BrainstormSession`` is added (via the repository), and the method returns a ``RedirectToActionResult`` with the expected properties. Mocked calls that aren't called are normally ignored, but calling ``Verifiable`` at the end of the setup call allows it to be verified in the test. This is done with the call to ``mockRepo.Verify``.
+
+.. note:: The Moq library used in this sample makes it easy to mix verifiable, or "strict", mocks with non-verifiable mocks (also called "loose" mocks or stubs). Learn more about `customizing Mock behavior with Moq <https://github.com/Moq/moq4/wiki/Quickstart#customizing-mock-behavior>`_.
 
 Another controller in the app displays information related to a particular brainstorming session. It includes some logic to deal with invalid id values:
 
@@ -58,13 +69,13 @@ Another controller in the app displays information related to a particular brain
   :language: c#
   :emphasize-lines: 16,20,25,33
 
-Looking at this controller action, it should be clear that there are at least three cases to test, one for each ``return`` statement. The unit tests are shown below:
+The controller action has three cases to test, one for each ``return`` statement:
 
 .. literalinclude:: testing/sample/TestingControllersSample/tests/TestingControllerSample.Tests/UnitTests/SessionControllerIndex.cs
   :language: c#
   :emphasize-lines: 16,26,39
 
-Finally, the application exposes some functionality as a web API, including a list of ideas associated with a brainstorming session and a method for adding new ideas to a session. The controller is shown below:
+The app exposes functionality as a web API (a list of ideas associated with a brainstorming session and a method for adding new ideas to a session):
 
 .. _ideas-controller:
 
@@ -72,11 +83,11 @@ Finally, the application exposes some functionality as a web API, including a li
   :language: c#
   :emphasize-lines: 20-22,27,29-35,49-51,55,60,70
 
-The ``ForSession`` method returns a list of ``dynamic`` types, with property names camel cased to match JavaScript conventions. Avoid returning your business domain entities directly via API calls, since frequently they include more data than the API client requires, and they unnecessarily couple your app's internal domain model with the API you expose externally. You can define strongly typed data-transfer objects (DTOs), or just return dynamic as this method does. Mapping between domain entities and the types you will return over the wire can be done manually (using a LINQ ``Select`` as shown here) or using a library like `AutoMapper <https://github.com/AutoMapper/AutoMapper>`_
+The ``ForSession`` method returns a list of anonymous types, with property names camel cased to match JavaScript conventions. Avoid returning your business domain entities directly via API calls, since frequently they include more data than the API client requires, and they unnecessarily couple your app's internal domain model with the API you expose externally. You can define strongly typed data-transfer objects (DTOs), or just return an anonymous type as this method does. Mapping between domain entities and the types you will return over the wire can be done manually (using a LINQ ``Select`` as shown here) or using a library like `AutoMapper <https://github.com/AutoMapper/AutoMapper>`_
 
-.. note:: Returning ``dynamic`` types is a common practice, especially in web API methods, since it's a simple, easy way to control the shape of the output. However, ``dynamic`` types are ``internal``, so unit tests that attempt to refer to their properties may encounter errors unless the web project is configured to make its internals visible to the test project.
+.. note:: Returning anonymous types is a common practice, especially in web API methods, since it's a simple, easy way to control the shape of the output. However, anonymous types are ``internal``, so unit tests that attempt to refer to their properties may encounter errors unless the web project is configured to make its internals visible to the test project.
 
-The unit tests for the ``ForSession`` API method is shown here:
+The unit tests for the ``ForSession`` API:
 
 .. literalinclude:: testing/sample/TestingControllersSample/tests/TestingControllerSample.Tests/UnitTests/ApiIdeasControllerForSession.cs
   :language: c#
@@ -94,21 +105,25 @@ To correct this error, add an assembly directive specifying that the web project
   :language: c#
   :emphasize-lines: 3
 
-With this in place, the test will pass, since the unit test project will have access to the internal-scoped dynamic return type. This is only a problem for unit tests that directly inspect the result - integration tests do not require ``InternalsVisibleTo`` since they get a result from an ``HttpClient``, not a direct method return.
+With this in place, the test will pass, since the unit test project will have access to the internal-scoped anonymous return type. This is only a problem for unit tests that directly inspect the result - integration tests do not require ``InternalsVisibleTo`` since they get a result from an ``HttpClient``, not a direct method return.
 
-The unit tests for the ``Create`` method are shown here:
+The unit tests for the ``Create``:
 
 .. literalinclude:: testing/sample/TestingControllersSample/tests/TestingControllerSample.Tests/UnitTests/ApiIdeasControllerCreate.cs
   :language: c#
   :emphasize-lines: 13-14,18,23-24,28,35-36
 
-Again, to test the behavior of the method when ``ModelState`` is invalid, the test adds a model error to the controller. Don't try to test model validation or model binding in your unit tests - just test your action method's behavior. The second test depends on the repository returning null, so the mock repository is configured to return null. There's no need to create a test database (in memory or otherwise) and construct a query that will return this result - it can be done in a single line as shown. The last test needs to verify that the repository's ``Update`` method is called, so once more this mock call is called with ``Verifiable`` and then the mocked repository's ``Verify`` method is called to confirm the verifiable method was executed as expected. It's not a unit test responsibility to ensure that the ``Update`` method really did save the data - that can be done with an integration test.
+As stated previously, to test the behavior of the method when ``ModelState`` is invalid, add a model error to the controller. Don't try to test model validation or model binding in your unit tests - just test your action method's behavior.
+
+The second test depends on the repository returning null, so the mock repository is configured to return null. There's no need to create a test database (in memory or otherwise) and construct a query that will return this result - it can be done in a single line as shown.
+
+The last test verifies that the repository's ``Update`` method is called. As we did previously, the mock is called with ``Verifiable`` and then the mocked repository's ``Verify`` method is called to confirm the verifiable method was executed. It's not a unit test responsibility to ensure that the ``Update`` method saved the data; that should be done with an integration test.
 
 Integration Testing
 -------------------
 :doc:`Integration testing </testing/integration-testing>` is done to ensure separate modules within your app work correctly together. Generally, anything you can test with a unit test, you can also test with an integration test, but the reverse isn't true. However, integration tests tend to be much slower than unit tests. Thus, it's best to test whatever you can with unit tests, and use integration tests for scenarios that involve multiple collaborators.
 
-Although they may still be useful, mock objects are rarely used in integration tests. In unit testing, mock objects are an effective way to control how collaborators outside of the unit being tested should behave for the purposes of the test. In an integration test, real collaborators are used, to confirm the whole subsystem works together correctly.
+Although they may still be useful, mock objects are rarely used in integration tests. In unit testing, mock objects are an effective way to control how collaborators outside of the unit being tested should behave for the purposes of the test. In an integration test, real collaborators are used to confirm the whole subsystem works together correctly.
 
 Application State
 ^^^^^^^^^^^^^^^^^
@@ -116,7 +131,7 @@ One important consideration when performing integration testing is how to set yo
 
 In this sample application, I'm using Entity Framework Core's InMemoryDatabase support, so I can't just connect to it from my test project. Instead, I expose an ``InitializeDatabase`` method from the app's ``Startup`` class, which I call when the app starts up if it's in the ``Development`` environment. My integration tests automatically benefit from this as long as they set the environment to ``Development``. I don't have to worry about resetting the database, since the InMemoryDatabase is reset each time the app restarts.
 
-The app's ``Startup`` class is shown here:
+The ``Startup`` class:
 
 .. literalinclude:: testing/sample/TestingControllersSample/src/TestingControllersSample/Startup.cs
   :language: c#
@@ -143,7 +158,7 @@ In the test above, the ``responseString`` gets the actual rendered HTML from the
 
 API Methods
 ^^^^^^^^^^^
-If your app exposes web APIs, it's a good idea to have automated tests confirm they execute as expected. The built-in ``TestServer`` makes this much easier to do than in previous versions of ASP.NET. If your API methods are using model binding, you should always check ``ModelState.IsValid``, and integration tests are the right place to confirm that your model validation is working properly. 
+If your app exposes web APIs, it's a good idea to have automated tests confirm they execute as expected. The built-in ``TestServer`` makes it easy to test web APIs. If your API methods are using model binding, you should always check ``ModelState.IsValid``, and integration tests are the right place to confirm that your model validation is working properly. 
 
 The following set of tests target the ``Create`` method in the :ref:`IdeasController <ideas-controller>` class shown above:
 
@@ -153,6 +168,6 @@ The following set of tests target the ``Create`` method in the :ref:`IdeasContro
   :dedent: 8
   :emphasize-lines: 1-2,9-10,17-18,25-26,33-34,42-43,51
 
-Unlike integration tests of actions that returns HTML views, web API methods that return results can usually be cast to strongly typed objects, as the last test above shows. In this case, the test casts the result to a ``BrainStormSession`` instance, and confirms that the idea was correctly added to its collection of ideas.
+Unlike integration tests of actions that returns HTML views, web API methods that return results can usually be cast to strongly typed objects, as the last test above shows. In this case, the test casts the result to a ``BrainstormSession`` instance, and confirms that the idea was correctly added to its collection of ideas.
 
 You'll find additional examples of integration tests in this article's `sample project <https://github.com/aspnet/Docs/tree/1.0.0-rc1/aspnet/mvc/controllers/testing/sample>`_.
